@@ -1,6 +1,6 @@
 {
   "name": "gapj_vue_router",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/gap-vue-router-cjs.js",
   "scripts": {
