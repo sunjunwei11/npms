@@ -1,0 +1,12 @@
+{
+  "name": "gapj_vue_router",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/gap-vue-router-cjs.js",
+  "scripts": {
+    "build": "rollup --config rollup.config.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
