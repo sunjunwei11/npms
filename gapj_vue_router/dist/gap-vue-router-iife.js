@@ -6,11 +6,32 @@ var iife_ok = (function () {
     class MyVueRouter {
         constructor(options) {
             this.options = options;
+            this.current = '/';
+            this.hashChange = this.hashChange.bind(this);
 
-            Vue.util.defineReactive(this, 'current', window.location.hash.slice(1));
+            Vue.util.defineReactive(this, 'matchRoutes', []);
 
-            window.addEventListener('hashchange', () => {
-                this.current = window.location.hash.slice(1);
+            window.addEventListener('load', this.hashChange);
+            window.addEventListener('hashchange', this.hashChange);
+        }
+        hashChange() {
+            this.matchRoutes = [];
+            this.current = window.location.hash.slice(1);
+            this.match(this.options.routes);
+        }
+        match(routes) {
+            routes.forEach(item => {
+                if (item.path === '/' && item.path === this.current) {
+                    this.matchRoutes.push(item);
+                    return;
+                }
+                if (item.path !== '/' && this.current.indexOf(item.path) !== -1) {
+                    this.matchRoutes.push(item);
+                    if (item.children) {
+                        this.match(item.children);
+                    }
+                    return;
+                }
             });
         }
     }
@@ -45,16 +66,24 @@ var iife_ok = (function () {
 
         Vue.component('router-view', {
             render(h) {
-                const current = this.$router.current;
-                const routes = this.$router.options.routes;
+                let depth = 0;
+                this.$vnode.data.isRouterView = true;
+
+                let parent = this.$parent;
+                while (parent) {
+                    if (parent?.$vnode?.data?.isRouterView) {
+                        depth++;
+                    }
+                    parent = parent.$parent;
+                }
+
+                const matchRoutes = this.$router.matchRoutes;
 
                 let com = null;
 
-                routes.find(item => {
-                    if (item.path === current) {
-                        com = item.component;
-                    }
-                });
+                if (matchRoutes[depth]) {
+                    com = matchRoutes[depth].component;
+                }
 
                 return h(com);
             }
